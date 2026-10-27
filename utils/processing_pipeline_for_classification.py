@@ -18,7 +18,8 @@ def tokenization_processing(
                         no_stopwords = True,
                         lemmatized = True,
                         list_POS = ["n","v","a","r","s"],
-                        stemmed = False):
+                        stemmed = False,
+                        tokenized_output = True):
 
     tokenized_text = nltk.tokenize.word_tokenize(cleaned_text)
     pos_tags = [pos[1] for pos in nltk.tag.pos_tag(tokenized_text)]
@@ -38,6 +39,10 @@ def tokenization_processing(
     if stemmed:
         porterstemmer = nltk.stem.PorterStemmer()
         tokenized_text = [porterstemmer.stem(token) for token in tokenized_text]
+        
+    if not tokenized_output:
+        # Se tokenized_output=False, devolve apenas uma string limpa pronta para o Scikit-Learn
+        return " ".join(tokenized_text)
 
 
     if print_output:
