@@ -49,4 +49,7 @@ def tokenization_processing(
         print(cleaned_text)
         print(tokenized_text)
 
-    return (tokenized_text, pos_tags)
+    
+    return " ".join(tokenized_text)    
+
+  
