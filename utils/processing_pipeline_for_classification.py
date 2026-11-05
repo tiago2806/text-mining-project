@@ -31,6 +31,15 @@ def tokenization_processing(
 
     if no_stopwords:
         stopwords = nltk.corpus.stopwords.words("english")
+
+        custom_stopwords = {
+            "im", "dont", "like", "got", "get",
+            "na", "oh", "yeah", "aint", "know", 
+            "go", "come", "see"
+        }
+
+        stopwords.update(custom_stopwords)
+
         tokenized_text = [token for token in tokenized_text if token not in stopwords]
 
     if lemmatized:
