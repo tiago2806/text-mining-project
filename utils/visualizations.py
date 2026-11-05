@@ -4,10 +4,16 @@ import ast
 
 def get_clean_words(val):
     if isinstance(val, str):
-        try:
-            val = ast.literal_eval(val)
-        except:
+        val = val.strip()
+        if not val:
             return []
+        if val.startswith(("[", "(")):
+            try:
+                val = ast.literal_eval(val)
+            except (ValueError, SyntaxError):
+                return val.split()
+        else:
+            return val.split()
     if isinstance(val, tuple):
         val = val[0] 
         

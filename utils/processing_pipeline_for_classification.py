@@ -30,7 +30,7 @@ def tokenization_processing(
         pos_tags = None
 
     if no_stopwords:
-        stopwords = nltk.corpus.stopwords.words("english")
+        stopwords = set(nltk.corpus.stopwords.words("english"))
 
         custom_stopwords = {
             "im", "dont", "like", "got", "get",
