@@ -11,6 +11,7 @@ def lemmatize_all(token, list_pos=["n","v","a","r","s"]):
         token = wordnet_lem.lemmatize(token, arg_1)
     return token
 
+
 def tokenization_processing(
                         cleaned_text,
                         print_output = True,
@@ -31,6 +32,16 @@ def tokenization_processing(
 
     if no_stopwords:
         stopwords = nltk.corpus.stopwords.words("english")
+
+        custom_stopwords = {
+            "im", "dont", "like", "got", "get",
+            "na", "oh", "yeah", "aint", "know",
+            "go", "come", "see"
+        }
+
+        stopwords.update(custom_stopwords)
+
+
         tokenized_text = [token for token in tokenized_text if token not in stopwords]
 
     if lemmatized:
