@@ -35,7 +35,7 @@ def tokenization_processing(
         custom_stopwords = {
             "im", "dont", "like", "got", "get",
             "na", "oh", "yeah", "aint", "know", 
-            "go", "come", "see"
+            "go", "come", "see", "love", "baby", "youre", "say", "make","cant","wan"
         }
 
         stopwords.update(custom_stopwords)
