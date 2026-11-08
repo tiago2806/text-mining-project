@@ -31,14 +31,14 @@ def tokenization_processing(
 
     if no_stopwords:
         stopwords = set(nltk.corpus.stopwords.words("english"))
-
+        
         custom_stopwords = {
             "im", "dont", "like", "got", "get",
             "na", "oh", "yeah", "aint", "know", 
-            "go", "come", "see", "love", "baby", "youre", "say", "make","cant","wan"
+            "go", "come", "see", "youre", "make","cant"
         }
-
         stopwords.update(custom_stopwords)
+        
 
         tokenized_text = [token for token in tokenized_text if token not in stopwords]
 
