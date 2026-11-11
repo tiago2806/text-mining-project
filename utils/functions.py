@@ -127,13 +127,14 @@ def normalize_text(text,print_output = False, normalize_contractions = True,
             all_stopwords = set(nltk.corpus.stopwords.words("english"))
             if custom_stopwords:
                 all_stopwords.update(custom_stopwords)
+            tokenized_text = [token for token in tokenized_text if token not in all_stopwords]
 
     if lemmatize:
             tokenized_text = [lemmatize_function(token, list_pos=list_pos) for token in tokenized_text]
 
     if remove_stopwords:
         tokenized_text = [token for token in tokenized_text if token not in all_stopwords]
-        
+
     if stem:
         porterstemmer = nltk.stem.PorterStemmer()
         tokenized_text = [porterstemmer.stem(token) for token in tokenized_text]
