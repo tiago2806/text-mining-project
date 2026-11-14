@@ -4,6 +4,8 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
 import pandas as pd
+from scipy import sparse
+
 
 def evaluate_models(X_train_vec, X_test_vec, y_train, y_test, representation_name):
     models = {
@@ -17,9 +19,17 @@ def evaluate_models(X_train_vec, X_test_vec, y_train, y_test, representation_nam
     
     for name, model in models.items():
         # O Naive Bayes rebenta se houver valores negativos (Word2Vec / GloVe)
-        if name == 'Naive Bayes' and (X_train_vec < 0).any():
-            print(f"A saltar {name} (não aceita valores negativos nas representações densas).")
-            continue
+        if name == 'Naive Bayes':
+
+            if sparse.issparse(X_train_vec):
+                has_negative = (X_train_vec.data < 0).any()
+            else:
+                has_negative = (X_train_vec < 0).any()
+
+            if has_negative:
+                print(f"A saltar {name}: existem valores negativos.")
+                continue
+            
             
         print(f"A treinar {name} com {representation_name}...")
         model.fit(X_train_vec, y_train)
