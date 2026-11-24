@@ -105,7 +105,8 @@ def normalize_text(text,print_output = False, normalize_contractions = True,
             "youll": "you will", "weve":"we have", "theyre": "they are", "theyve":"they have",
             "itll": "it will", "itd": "it would", "wan na": "want to", "gon na": "going to",
             "wanna": "want to", "gonna": " going to", "gotta": "got to", "getta": "got to",
-            "got ta": "got to", "get ta":"got to"}
+            "got ta": "got to", "get ta":"got to", "youd": "you would", "theres": "there is",
+            "hes": "he is", "shes": "she is"}
         
         words = text.split()
         text = " ".join([contractions.get(word, word) for word in words])
