@@ -26,9 +26,12 @@ def verify_language(dataset, column):
 
 def clean_text(dataset,column, emojis = True, hashtags = True, mentions = True,
                   urls = True, html_tags = True, square_brackets = True, newlines = True,
-                  whitespaces = True, apostrophes= True,punctuation = True):
+                  whitespaces = True, apostrophes=False, punctuation=True):
 
     cleaned_col = dataset[column].astype(str).copy() 
+
+    # Normalize typographic apostrophes before later contraction expansion.
+    cleaned_col = cleaned_col.str.replace(r"[\u2018\u2019\u02BC\uFF07]", "'", regex=True)
     
     if emojis:
         cleaned_col = cleaned_col.apply(
@@ -64,7 +67,7 @@ def clean_text(dataset,column, emojis = True, hashtags = True, mentions = True,
                
     if punctuation:
         cleaned_col = cleaned_col.apply(
-            lambda x: re.sub(r'[^a-zA-Z0-9\s]', ' ', x))
+            lambda x: re.sub(r"[^a-zA-Z0-9'\s]", ' ', x))
             
     if whitespaces:
         cleaned_col = cleaned_col.apply(
@@ -90,26 +93,41 @@ def normalize_text(text,print_output = False, normalize_contractions = True,
 
     text = str(text)
 
+    # Convert curly apostrophes even when normalize_text is called on raw text.
+    text = re.sub(r"[\u2018\u2019\u02BC\uFF07]", "'", text)
+
     if lowercase:
         text = text.lower()
 
     if normalize_contractions:
         contractions = {
-            "aint": "is not", "arent": "are not", "cant": "cannot",
-            "couldve": "could have", "couldnt": "could not", "didnt": "did not",
-            "doesnt": "does not", "dont": "do not", "hadnt": "had not",
-            "hasnt": "has not", "havent": "have not", "wont": "will not",
-            "wouldve": "would have","i m":"i am", "im": "i am", "ive": "i have", "isnt": "is not",
-            "shouldnt": "should not", "wasnt": "was not","were": "we were", "werent": "were not",
-            "youre": "you are", "youve": "you have", "id": "i would", "ill": "i will",
-            "youll": "you will", "weve":"we have", "theyre": "they are", "theyve":"they have",
-            "itll": "it will", "itd": "it would", "wan na": "want to", "gon na": "going to",
-            "wanna": "want to", "gonna": " going to", "gotta": "got to", "getta": "got to",
-            "got ta": "got to", "get ta":"got to", "youd": "you would", "theres": "there is",
-            "hes": "he is", "shes": "she is"}
-        
-        words = text.split()
-        text = " ".join([contractions.get(word, word) for word in words])
+            "ain't": "is not", "aren't": "are not", "can't": "cannot",
+            "could've": "could have", "couldn't": "could not", "didn't": "did not",
+            "doesn't": "does not", "don't": "do not", "hadn't": "had not",
+            "hasn't": "has not", "haven't": "have not", "isn't": "is not",
+            "mustn't": "must not", "shan't": "shall not", "shouldn't": "should not",
+            "wasn't": "was not", "weren't": "were not", "won't": "will not",
+            "would've": "would have", "wouldn't": "would not",
+            "i'm": "i am", "i've": "i have", "i'll": "i will", "i'd": "i would",
+            "you're": "you are", "you've": "you have", "you'll": "you will", "you'd": "you would",
+            "we're": "we are", "we've": "we have", "we'll": "we will", "we'd": "we would",
+            "they're": "they are", "they've": "they have", "they'll": "they will", "they'd": "they would",
+            "he's": "he is", "he'll": "he will", "he'd": "he would",
+            "she's": "she is", "she'll": "she will", "she'd": "she would",
+            "it's": "it is", "it'll": "it will", "it'd": "it would",
+            "that's": "that is", "there's": "there is", "here's": "here is",
+            "what's": "what is", "who's": "who is", "let's": "let us",
+        }
+        contraction_pattern = re.compile(
+            r"(?<!\w)(?:" + "|".join(
+                re.escape(form) for form in sorted(contractions, key=len, reverse=True)
+            ) + r")(?!\w)"
+        )
+        text = contraction_pattern.sub(lambda match: contractions[match.group(0)], text)
+
+    # Strip remaining quote/possessive apostrophes after expanding contractions,
+    # so tokenizers cannot emit an apostrophe as a standalone "word".
+    text = text.replace("'", "")
 
     if custom_stopwords is None:
             custom_stopwords = set()
@@ -117,6 +135,7 @@ def normalize_text(text,print_output = False, normalize_contractions = True,
             custom_stopwords = set(custom_stopwords)
 
     tokenized_text = nltk.tokenize.word_tokenize(text)
+    tokenized_text = [token for token in tokenized_text if re.search(r"[A-Za-z0-9]", token)]
     
     if include_pos_tags:
         pos_tags = nltk.pos_tag(tokenized_text)
