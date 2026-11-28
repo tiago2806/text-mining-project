@@ -39,7 +39,7 @@ def clean_text(dataset,column, emojis = True, hashtags = True, mentions = True,
     
     if hashtags:
         cleaned_col = cleaned_col.apply(
-            lambda x: re.sub(r'#\S+',' ', x))
+            lambda x: re.sub(r'#', '', x))
             
     if mentions:
         cleaned_col = cleaned_col.apply(
@@ -87,7 +87,7 @@ def lemmatize_function(token, list_pos=["n","v","a","r","s"]):
 
 
 def normalize_text(text,print_output = False, normalize_contractions = True,
-                   lowercase = True, remove_stopwords = True,include_pos_tags = False,
+                   lowercase = True, remove_stopwords = True,
                    custom_stopwords = None, lemmatize = True, stem = False,
                    list_pos = ["n","v","a","r","s"], tokenized_output = False):
 
@@ -136,11 +136,6 @@ def normalize_text(text,print_output = False, normalize_contractions = True,
 
     tokenized_text = nltk.tokenize.word_tokenize(text)
     tokenized_text = [token for token in tokenized_text if re.search(r"[A-Za-z0-9]", token)]
-    
-    if include_pos_tags:
-        pos_tags = nltk.pos_tag(tokenized_text)
-    else:
-        pos_tags = None
 
     all_stopwords = set()
     if remove_stopwords:
